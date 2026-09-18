@@ -286,10 +286,10 @@ export default function Home() {
                   key={node.id}
                   className="absolute z-20 -translate-x-1/2 -translate-y-1/2"
                   style={{ left: `${node.x}%`, top: `${node.y}%` }}
+                  onMouseEnter={() => playAWSong(node.id)}
+                  onMouseLeave={stopAWSong}
                 >
                   <motion.div
-                    onMouseEnter={() => playAWSong(node.id)}
-                    onMouseLeave={stopAWSong}
                     whileHover={{ scale: 1.5 }}
                     animate={!isActive ? { boxShadow: ["0 0 10px rgba(6,182,212,0.5)", "0 0 25px rgba(6,182,212,0.9)", "0 0 10px rgba(6,182,212,0.5)"] } : {}}
                     transition={{ duration: 2, repeat: Infinity }}
@@ -307,7 +307,7 @@ export default function Home() {
                         initial={{ opacity: 0, y: 10, scale: 0.8 }}
                         animate={{ opacity: 1, y: node.y > 50 ? -40 : 40, scale: 1 }}
                         exit={{ opacity: 0, y: 10, scale: 0.8 }}
-                        className="absolute left-1/2 -translate-x-1/2 whitespace-nowrap bg-black/80 border border-cyan-500/50 backdrop-blur-md px-4 py-2 rounded-lg"
+                        className="absolute left-1/2 -translate-x-1/2 whitespace-nowrap bg-black/80 border border-cyan-500/50 backdrop-blur-md px-4 py-2 rounded-lg pointer-events-none z-50"
                       >
                         <p className="text-white font-black tracking-widest uppercase text-sm md:text-base drop-shadow-[0_0_8px_rgba(255,255,255,0.8)]">
                           {node.title}
