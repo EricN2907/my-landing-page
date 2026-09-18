@@ -29,9 +29,9 @@ export default function Home() {
 
   const playAWSong = (id: number) => {
     setActiveAW(id);
-    if (awAudioRef.current) {
-      // Dùng tạm 1 đoạn nhạc EDM royalty-free từ SoundHelix do Pixabay chặn hotlink
-      awAudioRef.current.src = "https://www.soundhelix.com/examples/mp3/SoundHelix-Song-8.mp3";
+    const node = awNodes.find(n => n.id === id);
+    if (awAudioRef.current && node) {
+      awAudioRef.current.src = node.audio;
       awAudioRef.current.play().catch(e => console.log("Audio play blocked by browser", e));
       
       // Tạm dừng nhạc nền Lofi nếu đang bật
@@ -62,11 +62,11 @@ export default function Home() {
 
   // Tọa độ 5 đỉnh của chữ W
   const awNodes = [
-    { id: 1, title: "Alone", x: 10, y: 15 },
-    { id: 2, title: "Sing Me To Sleep", x: 30, y: 85 },
-    { id: 3, title: "The Spectre", x: 50, y: 40 },
-    { id: 4, title: "Ignite", x: 70, y: 85 },
-    { id: 5, title: "On My Way", x: 90, y: 15 },
+    { id: 1, title: "Alone", x: 10, y: 15, audio: "https://audio-ssl.itunes.apple.com/itunes-assets/AudioPreview221/v4/a2/71/3f/a2713f1c-c1a2-86b3-5ec2-633e71927fae/mzaf_1625470662823872018.plus.aac.p.m4a" },
+    { id: 2, title: "Sing Me To Sleep", x: 30, y: 85, audio: "https://audio-ssl.itunes.apple.com/itunes-assets/AudioPreview221/v4/8a/f5/81/8af58164-55a1-1cfe-2749-c3166cf1defd/mzaf_13890035559065524537.plus.aac.p.m4a" },
+    { id: 3, title: "The Spectre", x: 50, y: 40, audio: "https://audio-ssl.itunes.apple.com/itunes-assets/AudioPreview211/v4/b2/06/ae/b206ae07-8bdb-2405-b8f2-d85a777aa69d/mzaf_1782105357937446994.plus.aac.p.m4a" },
+    { id: 4, title: "Ignite", x: 70, y: 85, audio: "https://audio-ssl.itunes.apple.com/itunes-assets/AudioPreview221/v4/55/18/68/551868c0-feaa-65ca-a589-58049e401797/mzaf_17405011615928886017.plus.aac.p.m4a" },
+    { id: 5, title: "On My Way", x: 90, y: 15, audio: "https://audio-ssl.itunes.apple.com/itunes-assets/AudioPreview221/v4/b2/85/49/b28549a1-db17-cf5d-8442-9a6cb4810ab9/mzaf_359154721032886178.plus.aac.p.m4a" },
   ];
 
   return (
