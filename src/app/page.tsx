@@ -2,7 +2,7 @@
 
 import { useState, useRef, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { Music, Radio, Disc, Play, Heart, Headphones, ChevronRight, PlayCircle, Star, MessageCircle, CheckCircle, Clock, Volume2, VolumeX } from "lucide-react";
+import { Music, Radio, Disc, Play, Heart, Headphones, ChevronRight, PlayCircle, Star, MessageCircle, CheckCircle, Clock, Volume2, VolumeX, Search } from "lucide-react";
 import { statistics, genres, topVibers, steps, testimonials, suggestedVibes, trendingTracks } from "@/data/mockData";
 import Link from "next/link";
 
@@ -15,6 +15,10 @@ export default function Home() {
   // Alan Walker Section Audio State
   const awAudioRef = useRef<HTMLAudioElement | null>(null);
   const [activeAW, setActiveAW] = useState<number | null>(null);
+
+  // --- FILTER STATES ---
+  const [searchQuery, setSearchQuery] = useState("");
+  const [selectedGenre, setSelectedGenre] = useState("Tất Cả");
 
   // Sync Volume
   useEffect(() => {
@@ -75,6 +79,15 @@ export default function Home() {
     { id: 4, title: "Ignite", x: 70, y: 85, audio: "https://audio-ssl.itunes.apple.com/itunes-assets/AudioPreview221/v4/55/18/68/551868c0-feaa-65ca-a589-58049e401797/mzaf_17405011615928886017.plus.aac.p.m4a" },
     { id: 5, title: "On My Way", x: 90, y: 15, audio: "https://audio-ssl.itunes.apple.com/itunes-assets/AudioPreview221/v4/b2/85/49/b28549a1-db17-cf5d-8442-9a6cb4810ab9/mzaf_359154721032886178.plus.aac.p.m4a" },
   ];
+
+  // Filter Logic
+  const allGenres = ["Tất Cả", ...Array.from(new Set(suggestedVibes.flatMap(v => v.tags)))];
+  
+  const filteredVibes = suggestedVibes.filter(vibe => {
+    const matchSearch = vibe.title.toLowerCase().includes(searchQuery.toLowerCase()) || vibe.description.toLowerCase().includes(searchQuery.toLowerCase());
+    const matchGenre = selectedGenre === "Tất Cả" || vibe.tags.includes(selectedGenre);
+    return matchSearch && matchGenre;
+  });
 
   return (
     <main className="bg-[#0a0a10] text-white font-sans selection:bg-cyan-500/30 selection:text-cyan-200 overflow-hidden relative min-h-screen">
@@ -355,7 +368,7 @@ export default function Home() {
       {/* --- SUGGESTED VIBES / PLAYLISTS --- */}
       <section className="py-24 px-6 relative z-10 bg-[#0a0a10]">
         <div className="max-w-7xl mx-auto">
-          <div className="flex flex-col md:flex-row justify-between items-end mb-12 gap-6">
+          <div className="flex flex-col md:flex-row justify-between items-end mb-8 gap-6">
             <motion.div
               initial={{ opacity: 0, x: -50 }}
               whileInView={{ opacity: 1, x: 0 }}
@@ -368,51 +381,86 @@ export default function Home() {
             </motion.div>
           </div>
 
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
-            {suggestedVibes.map((vibe, idx) => (
-              <motion.div
-                key={vibe.id}
-                initial={{ opacity: 0, y: 50 }}
-                whileInView={{ opacity: 1, y: 0 }}
-                transition={{ delay: idx * 0.15, type: "spring", stiffness: 50 }}
-                viewport={{ once: true }}
-                whileHover={{ y: -10 }}
-                className="group relative rounded-2xl overflow-hidden cursor-pointer shadow-xl"
-              >
-                <div className="aspect-square relative overflow-hidden">
-                  <motion.img 
-                    whileHover={{ scale: 1.15 }}
-                    transition={{ duration: 0.5 }}
-                    src={vibe.image} 
-                    alt={vibe.title} 
-                    className="w-full h-full object-cover"
-                  />
-                  <div className="absolute inset-0 bg-gradient-to-t from-[#0a0a10] via-black/40 to-transparent" />
-                  
-                  <div className="absolute inset-0 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity bg-black/40 backdrop-blur-sm">
-                    <motion.div 
-                      whileHover={{ scale: 1.2, rotate: 90 }}
-                      className="w-16 h-16 bg-fuchsia-500 rounded-full flex items-center justify-center text-white shadow-lg shadow-fuchsia-500/50"
-                    >
-                      <Play className="w-8 h-8 ml-1" />
-                    </motion.div>
-                  </div>
-                </div>
+          {/* Filter & Search Bar */}
+          <div className="flex flex-col lg:flex-row gap-6 justify-between items-center mb-12">
+            {/* Genre Filter Pills */}
+            <div className="flex flex-wrap gap-3 w-full lg:w-auto">
+              {allGenres.map(genre => (
+                <button
+                  key={genre}
+                  onClick={() => setSelectedGenre(genre)}
+                  className={`px-5 py-2 rounded-full font-bold text-sm transition-all ${
+                    selectedGenre === genre 
+                      ? "bg-fuchsia-500 text-white shadow-[0_0_15px_rgba(217,70,239,0.5)]" 
+                      : "bg-white/5 text-gray-400 hover:bg-white/10 hover:text-white"
+                  }`}
+                >
+                  {genre}
+                </button>
+              ))}
+            </div>
 
-                <div className="absolute bottom-0 left-0 p-6 w-full transform transition-transform duration-300 group-hover:-translate-y-2">
-                  <h3 className="text-2xl font-bold text-white mb-2">{vibe.title}</h3>
-                  <div className="flex flex-wrap gap-2 mb-3">
-                    {vibe.tags.map(tag => (
-                      <span key={tag} className="text-[10px] uppercase font-bold px-2 py-1 bg-white/20 backdrop-blur-md rounded-md text-white">
-                        {tag}
-                      </span>
-                    ))}
-                  </div>
-                  <p className="text-sm text-gray-300 line-clamp-2 opacity-0 group-hover:opacity-100 transition-opacity duration-300">{vibe.description}</p>
-                </div>
-              </motion.div>
-            ))}
+            {/* Search Bar */}
+            <div className="relative w-full lg:w-80">
+              <input 
+                type="text"
+                placeholder="Tìm kiếm playlist..."
+                value={searchQuery}
+                onChange={(e) => setSearchQuery(e.target.value)}
+                className="w-full bg-white/5 border border-white/10 text-white px-5 py-3 pl-12 rounded-full outline-none focus:border-fuchsia-500 transition-colors"
+              />
+              <Search className="w-5 h-5 text-gray-400 absolute left-4 top-1/2 -translate-y-1/2" />
+            </div>
           </div>
+
+          {filteredVibes.length === 0 ? (
+            <div className="text-center py-20 bg-white/5 rounded-2xl border border-white/10">
+              <h3 className="text-2xl font-bold text-gray-400 mb-2">Không tìm thấy playlist nào!</h3>
+              <p className="text-gray-500">Thử tìm kiếm với một từ khóa khác xem sao.</p>
+            </div>
+          ) : (
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+              {filteredVibes.map((vibe, idx) => (
+                <motion.div
+                  key={vibe.id}
+                  initial={{ opacity: 0, y: 50 }}
+                  whileInView={{ opacity: 1, y: 0 }}
+                  transition={{ delay: (idx % 4) * 0.15, type: "spring", stiffness: 50 }}
+                  viewport={{ once: true }}
+                  className="group relative rounded-2xl bg-white/5 border border-white/5 hover:border-white/10 overflow-hidden cursor-pointer shadow-lg hover:shadow-2xl transition-all hover:-translate-y-2"
+                >
+                  {/* Image Container */}
+                  <div className="aspect-square relative overflow-hidden bg-black">
+                    <img 
+                      src={vibe.image} 
+                      alt={vibe.title} 
+                      className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110 opacity-80 group-hover:opacity-100"
+                    />
+                    
+                    {/* Play button at bottom right corner (Spotify style) */}
+                    <div className="absolute bottom-4 right-4 opacity-0 group-hover:opacity-100 translate-y-4 group-hover:translate-y-0 transition-all duration-300 z-10">
+                      <div className="w-14 h-14 bg-fuchsia-500 rounded-full flex items-center justify-center text-white shadow-lg shadow-fuchsia-500/50 hover:scale-105 transition-transform">
+                        <Play className="w-6 h-6 ml-1 text-white fill-white" />
+                      </div>
+                    </div>
+                  </div>
+
+                  {/* Text Container */}
+                  <div className="p-5">
+                    <h3 className="text-xl font-bold text-white mb-2 truncate group-hover:text-fuchsia-400 transition-colors">{vibe.title}</h3>
+                    <div className="flex flex-wrap gap-2 mb-3">
+                      {vibe.tags.map(tag => (
+                        <span key={tag} className="text-[10px] uppercase font-bold px-2 py-1 bg-white/10 rounded-md text-gray-300">
+                          {tag}
+                        </span>
+                      ))}
+                    </div>
+                    <p className="text-sm text-gray-400 line-clamp-2">{vibe.description}</p>
+                  </div>
+                </motion.div>
+              ))}
+            </div>
+          )}
         </div>
       </section>
 
