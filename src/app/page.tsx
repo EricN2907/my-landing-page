@@ -9,11 +9,18 @@ import Link from "next/link";
 export default function Home() {
   // --- AUDIO STATES ---
   const [isPlaying, setIsPlaying] = useState(false);
+  const [volume, setVolume] = useState(0.5);
   const audioRef = useRef<HTMLAudioElement | null>(null);
   
   // Alan Walker Section Audio State
   const awAudioRef = useRef<HTMLAudioElement | null>(null);
   const [activeAW, setActiveAW] = useState<number | null>(null);
+
+  // Sync Volume
+  useEffect(() => {
+    if (audioRef.current) audioRef.current.volume = volume;
+    if (awAudioRef.current) awAudioRef.current.volume = volume;
+  }, [volume]);
 
   // --- HANDLERS ---
   const togglePlay = () => {
@@ -76,33 +83,47 @@ export default function Home() {
       <audio ref={audioRef} loop src="https://www.soundhelix.com/examples/mp3/SoundHelix-Song-1.mp3" />
       <audio ref={awAudioRef} loop />
 
-      {/* Floating Audio Controller */}
-      <motion.button
-        onClick={togglePlay}
-        whileHover={{ scale: 1.1 }}
-        whileTap={{ scale: 0.9 }}
-        className={`fixed bottom-8 right-8 z-50 w-16 h-16 rounded-full flex items-center justify-center transition-all duration-300 shadow-2xl ${
-          isPlaying 
-            ? "bg-gradient-to-r from-cyan-500 to-violet-600 shadow-cyan-500/50" 
-            : "bg-white/10 backdrop-blur-md border border-white/20 text-gray-300"
-        }`}
-      >
-        {isPlaying ? (
-          <motion.div animate={{ rotate: 360 }} transition={{ duration: 3, repeat: Infinity, ease: "linear" }}>
-            <Disc className="w-8 h-8 text-white" />
-          </motion.div>
-        ) : (
-          <VolumeX className="w-7 h-7" />
-        )}
-        
-        {isPlaying && (
-          <div className="absolute -top-2 -right-2 flex gap-1">
-            <motion.span animate={{ height: [4, 12, 4] }} transition={{ repeat: Infinity, duration: 0.5 }} className="w-1 bg-cyan-400 rounded-full"></motion.span>
-            <motion.span animate={{ height: [8, 4, 16, 8] }} transition={{ repeat: Infinity, duration: 0.7 }} className="w-1 bg-violet-400 rounded-full"></motion.span>
-            <motion.span animate={{ height: [4, 16, 4] }} transition={{ repeat: Infinity, duration: 0.6 }} className="w-1 bg-fuchsia-400 rounded-full"></motion.span>
-          </div>
-        )}
-      </motion.button>
+      {/* Floating Audio Controller & Volume */}
+      <div className="fixed bottom-8 right-8 z-50 flex items-center gap-4 bg-[#0a0a10]/80 backdrop-blur-xl border border-white/10 p-2 pr-2 pl-5 rounded-full shadow-[0_0_30px_rgba(6,182,212,0.15)] transition-all">
+        {/* Volume Slider */}
+        <div className="flex items-center gap-2">
+          {volume === 0 ? <VolumeX className="w-4 h-4 text-gray-400" /> : <Volume2 className="w-4 h-4 text-gray-400" />}
+          <input 
+            type="range" min="0" max="1" step="0.01" 
+            value={volume} 
+            onChange={(e) => setVolume(parseFloat(e.target.value))}
+            className="w-20 md:w-28 h-1 bg-white/20 rounded-full appearance-none cursor-pointer accent-cyan-400"
+          />
+        </div>
+
+        {/* Play/Pause Button */}
+        <motion.button
+          onClick={togglePlay}
+          whileHover={{ scale: 1.05 }}
+          whileTap={{ scale: 0.95 }}
+          className={`w-14 h-14 rounded-full flex items-center justify-center transition-all duration-300 shadow-xl relative ${
+            isPlaying 
+              ? "bg-gradient-to-r from-cyan-500 to-violet-600 shadow-[0_0_20px_rgba(6,182,212,0.5)]" 
+              : "bg-white/10 text-gray-300"
+          }`}
+        >
+          {isPlaying ? (
+            <motion.div animate={{ rotate: 360 }} transition={{ duration: 3, repeat: Infinity, ease: "linear" }}>
+              <Disc className="w-7 h-7 text-white" />
+            </motion.div>
+          ) : (
+            <PlayCircle className="w-7 h-7 ml-1" />
+          )}
+          
+          {isPlaying && (
+            <div className="absolute -top-1 -right-1 flex gap-1 pointer-events-none">
+              <motion.span animate={{ height: [4, 12, 4] }} transition={{ repeat: Infinity, duration: 0.5 }} className="w-1 bg-cyan-400 rounded-full"></motion.span>
+              <motion.span animate={{ height: [8, 4, 16, 8] }} transition={{ repeat: Infinity, duration: 0.7 }} className="w-1 bg-violet-400 rounded-full"></motion.span>
+              <motion.span animate={{ height: [4, 16, 4] }} transition={{ repeat: Infinity, duration: 0.6 }} className="w-1 bg-fuchsia-400 rounded-full"></motion.span>
+            </div>
+          )}
+        </motion.button>
+      </div>
 
       {/* Background Animated Neon Glows */}
       <motion.div 
