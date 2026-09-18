@@ -30,9 +30,8 @@ export default function Home() {
   const playAWSong = (id: number) => {
     setActiveAW(id);
     if (awAudioRef.current) {
-      // Vì không có link mp3 gốc của Alan Walker, dùng tạm 1 beat EDM royalty-free
-      // Trong thực tế, bạn sẽ thay src bằng link bài tương ứng (Alone, Ignite...)
-      awAudioRef.current.src = "https://cdn.pixabay.com/download/audio/2022/10/25/audio_1669438096.mp3?filename=cyberpunk-2099-10701.mp3";
+      // Dùng tạm 1 đoạn nhạc EDM royalty-free từ SoundHelix do Pixabay chặn hotlink
+      awAudioRef.current.src = "https://www.soundhelix.com/examples/mp3/SoundHelix-Song-8.mp3";
       awAudioRef.current.play().catch(e => console.log("Audio play blocked by browser", e));
       
       // Tạm dừng nhạc nền Lofi nếu đang bật
@@ -74,7 +73,7 @@ export default function Home() {
     <main className="bg-[#0a0a10] text-white font-sans selection:bg-cyan-500/30 selection:text-cyan-200 overflow-hidden relative min-h-screen">
       
       {/* --- BACKGROUND MUSIC PLAYER --- */}
-      <audio ref={audioRef} loop src="https://cdn.pixabay.com/download/audio/2022/05/27/audio_1808fbf07a.mp3?filename=lofi-study-112191.mp3" />
+      <audio ref={audioRef} loop src="https://www.soundhelix.com/examples/mp3/SoundHelix-Song-1.mp3" />
       <audio ref={awAudioRef} loop />
 
       {/* Floating Audio Controller */}
